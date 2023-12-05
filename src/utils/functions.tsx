@@ -251,7 +251,8 @@ export function isToLargerThenFromWithQuestionmark(from, to) {
   const toNumber = parseFloat(toString.replace(/,/g, "")); // Remove commas
 
   // Check if toNumber is greater than fromNumber
-  return toNumber > fromNumber;
+  // 숫자가 같은 경우, 올라가는 효과를 적용하기 위해 true로 지정하기
+  return toNumber === fromNumber ? true : toNumber > fromNumber;
 }
 
 // from, to 값(string) width 계산하는 함수 - prefix/suffix 제외
@@ -381,15 +382,32 @@ const baseNumWidths = {
   "?": 5.172,
   "？": 8.656
 };
+const baseNumWidthsFramer = {
+  "0": 6.695,
+  "1": 4.602,
+  "2": 6.125,
+  "3": 6.359,
+  "4": 6.352,
+  "5": 6.234,
+  "6": 6.438,
+  "7": 5.594,
+  "8": 6.617,
+  "9": 6.438,
+  "-": 4.641,
+  ",": 3.047,
+  ".": 2.742,
+  "?": 5.203,
+  "？": 8.656
+};
 
 export function getNumWidthsWhenBold(fontSize) {
   // Create an object to store the widths for the given font size
   const widthsForFontSize = {};
 
   // Calculate the widths for each character based on the provided font size and base font size
-  for (const char in baseNumWidths) {
+  for (const char in baseNumWidthsFramer) {
     widthsForFontSize[char] = Number(
-      (baseNumWidths[char] * (fontSize / 10)).toFixed(3)
+      (baseNumWidthsFramer[char] * (fontSize / 10)).toFixed(3)
     );
   }
 

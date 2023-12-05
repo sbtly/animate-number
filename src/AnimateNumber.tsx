@@ -77,8 +77,8 @@ export function AnimateNumber(props) {
 
   const [state, setState] = useState(false);
   const [playLoop, setPlayLoop] = useState(false);
-  const [localeFrom, setLocaleFrom] = useState(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
-  const [localeTo, setLocaleTo] = useState(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+  // const [localeFrom, setLocaleFrom] = useState(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+  // const [localeTo, setLocaleTo] = useState(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
 
 
   const [resultFromArr, setResultFromArr] = useState([]);
@@ -101,6 +101,8 @@ export function AnimateNumber(props) {
   const [loopArr, setLoopArr] = useState([]);
   const [toIsLargerThenFrom, setToIsLargerThenFrom] = useState();
   const [toIsLongerThenFrom, setToIsLongerThenFrom] = useState();
+
+  // const [numWidths, setNumWidths] = useState(getNumWidthsWhenBold(props.fontSize));
 
   const tl = useRef();
   const outFromCharsMotion = useRef();
@@ -143,7 +145,7 @@ export function AnimateNumber(props) {
     },
     normal: {
       // hideLoopEasing: spring.small,
-      hideLoopEasing: spring.quick,
+      hideLoopEasing: spring.rapid,
       inEasing: spring.small,
       loopPreset: "normal",
       outStaggerDelay: 0.03,
@@ -153,7 +155,7 @@ export function AnimateNumber(props) {
     },
     bounce: {
       // hideLoopEasing: spring.small,
-      hideLoopEasing: spring.quick,
+      hideLoopEasing: spring.rapid,
       inEasing: spring.bounce2,
       loopPreset: "fast",
       outStaggerDelay: 0.03,
@@ -173,7 +175,7 @@ export function AnimateNumber(props) {
   const loopInDelay = 0.03;
 
 
-  const deps = [state, props.replay, props.rollAllDigits, props.quickMode, props.hidePreSuffixWhileMoving, props.loopingDuration, props.fontSize, props.fontColor, props.from, props.to, props.prefix, props.suffix, props.align, props.preset, props.delay, toIsLargerThenFrom, localeFrom, localeTo] // toIsLargetThenFrom 안넣으면 from/to 바꿔도 div에 바로 반영이 안됨
+  const deps = [state, props.replay, props.rollAllDigits, props.quickMode, props.hidePreSuffixWhileMoving, props.loopingDuration, props.fontSize, props.fontColor, JSON.stringify(props.from), JSON.stringify(props.to), props.from, props.to, props.prefix, props.suffix, props.align, props.preset, props.delay] // toIsLargetThenFrom 안넣으면 from/to 바꿔도 div에 바로 반영이 안됨
   const key = JSON.stringify(deps.join("-"))
   console.log(key)
 
@@ -191,12 +193,12 @@ export function AnimateNumber(props) {
     // 쉼표 무시 안하고! 자릿수 array도 만들어
     const fromArr = isNaN(props.from)
       ? convertStringToArray(props.from)
-      // : props.from?.toLocaleString().split("");
-      : localeFrom?.split("")
+      : props.from?.toLocaleString().split("");
+      // : props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ',').split("")
     const toArr = isNaN(props.to)
       ? convertStringToArray(props.to)
-      // : props.to?.toLocaleString().split("");
-      : localeTo?.split("")
+      : props.to?.toLocaleString().split("");
+      // : props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ',').split("")
     console.log(fromArr, toArr);
 
     // from, to 중 뭐가 더 긴지 판단 - 어디에 Loop 개수를 맞출지에 사용될 기준
@@ -356,13 +358,13 @@ export function AnimateNumber(props) {
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
       // console.log('inEasing is ', inEasing)
-      tl.current = null;
+      // tl.current = null;
 
       // from, to 값의 width 구하기 - suffix width가 왤케 안잡히지..
-      const fromValWidth = calculateWidth(localeFrom, numWidths);
-      const toValWidth = calculateWidth(localeTo, numWidths);
-      // const fromValWidth = calculateWidth(props.from.toLocaleString(), numWidths);
-      // const toValWidth = calculateWidth(props.to.toLocaleString(), numWidths);
+      // const fromValWidth = calculateWidth(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','), numWidths);
+      // const toValWidth = calculateWidth(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','), numWidths);
+      const fromValWidth = calculateWidth(props.from.toLocaleString(), numWidths);
+      const toValWidth = calculateWidth(props.to.toLocaleString(), numWidths);
       const prefixWidth = prefixRef.current.clientWidth;
       const suffixWidth = suffixRef.current.clientWidth;
 
@@ -440,7 +442,8 @@ export function AnimateNumber(props) {
 
       gsap.set(toSplit.chars, { opacity: 0 });
       gsap.set(wrapperRef.current, {
-        width: prefixWidth + fromValWidth + suffixWidth
+        // width: prefixWidth + fromValWidth + suffixWidth
+        width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
       });
 
       props.align !== "right" &&
@@ -857,11 +860,12 @@ export function AnimateNumber(props) {
     setState(!state)
   }, [] )
 
-  useEffect(() => {
-    setLocaleFrom(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','))
-    setLocaleTo(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','))
-  }, [props.from, props.to])
+  // useEffect(() => {
+  //   setLocaleFrom(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','))
+  //   setLocaleTo(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','))
+  // }, [props.from, props.to])
 
+// console.log(props.to?.toLocaleString())
   return (
     <>
       <div
@@ -899,8 +903,9 @@ export function AnimateNumber(props) {
               // color: "red"
             }}
           >
-            {/* {props.from && props.from?.toLocaleString()} */}
-            {localeFrom}
+            {props.from && props.from?.toLocaleString()}
+            {/* {localeFrom} */}
+            {/* {props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} */}
           </div>
           <div
             className="loopsGroup"
@@ -936,8 +941,9 @@ export function AnimateNumber(props) {
             className={toNum}
             style={{ left: props.align === "right" ? "unset" : 0 }}
           >
-            {/* {props.to && props.to?.toLocaleString()} */}
-            {localeTo}
+            {props.to && props.to?.toLocaleString()}
+            {/* {localeTo} */}
+            {/* {props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ',')} */}
           </div>
         </div>
         <div ref={suffixRef} className={suffix}>
@@ -988,13 +994,25 @@ addPropertyControls(AnimateNumber, {
     defaultValue: '#3182F6'
   },
   from: {
-    type: ControlType.String,
-    defaultValue: "1000",
+    type: ControlType.Number,
+    defaultValue: 0,
+    step: 1,
+    displayStepper: true
   },
   to: {
-    type: ControlType.String,
-    defaultValue: "1000",
+    type: ControlType.Number,
+    defaultValue: 1000,
+    step: 1,
+    displayStepper: true
   },
+  // from: {
+  //   type: ControlType.String,
+  //   defaultValue: "1000",
+  // },
+  // to: {
+  //   type: ControlType.String,
+  //   defaultValue: "1000",
+  // },
   prefix: {
     type: ControlType.String,
     defaultValue: "연 ",
