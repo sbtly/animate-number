@@ -1,7 +1,7 @@
-import { gsap } from "gsap";
-import { CustomEase } from "gsap/CustomEase";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
+import { gsap } from "gsap-trial";
+import { CustomEase } from "gsap-trial/CustomEase";
+import { ScrollTrigger } from "gsap-trial/ScrollTrigger";
+import { SplitText } from "gsap-trial/SplitText";
 import getSpringEasing from "./SpringCurve";
 import { ixdEasing } from "./token";
 
@@ -97,7 +97,7 @@ gsap.registerEffect({
   extendTimeline: true,
 });
 
-export * from "gsap";
-export * from "gsap/CustomEase";
-export * from "gsap/ScrollTrigger";
-export * from "gsap/SplitText";
+export * from "gsap-trial";
+export * from "gsap-trial/CustomEase";
+export * from "gsap-trial/ScrollTrigger";
+export * from "gsap-trial/SplitText";
