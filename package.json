@@ -32,7 +32,7 @@
   "dependencies": {
     "@emotion/css": "^11.11.2",
     "gsap": "./gsap-bonus.tgz",
-    "gsap-trial": "^3.12.3",
-    "newton-raphson-method": "^1.0.2"
+    "newton-raphson-method": "^1.0.2",
+    "split-type": "^0.3.4"
   }
 }

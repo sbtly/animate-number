@@ -1,11 +1,12 @@
-import { gsap } from "gsap-trial";
-import { CustomEase } from "gsap-trial/CustomEase";
-import { ScrollTrigger } from "gsap-trial/ScrollTrigger";
-import { SplitText } from "gsap-trial/SplitText";
+import { gsap } from "gsap";
+import { CustomEase } from "gsap/CustomEase";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+// import { SplitText } from "gsap/SplitText";
 import getSpringEasing from "./SpringCurve";
 import { ixdEasing } from "./token";
 
-gsap.registerPlugin(CustomEase, ScrollTrigger, SplitText);
+gsap.registerPlugin(CustomEase, ScrollTrigger);
+// gsap.registerPlugin(CustomEase, ScrollTrigger, SplitText);
 
 CustomEase.create("ease", "0.6, 0, 0, 0.6");
 CustomEase.create("out", "0.25, 0.1, 0.25, 1");
@@ -17,34 +18,34 @@ CustomEase.create("bezier2", "0.2, 0.5, 0.5, 0.8");
 CustomEase.create("inout", "0.46,0.03,0.52,0.96");
 // CustomEase.create("inout", "0.45,0.05,0.55,0.95");
 
-const { easeFunction: slowEase, duration: slowDuration } = getSpringEasing(
+const { easingFn: slowEase, duration: slowDuration } = getSpringEasing(
   ixdEasing.spring.slow
 );
-const { easeFunction: slow2Ease, duration: slow2Duration } = getSpringEasing(
+const { easingFn: slow2Ease, duration: slow2Duration } = getSpringEasing(
   ixdEasing.spring.slow2
 );
-const { easeFunction: basicEase, duration: basicDuration } = getSpringEasing(
+const { easingFn: basicEase, duration: basicDuration } = getSpringEasing(
   ixdEasing.spring.basic
 );
-const { easeFunction: basic2Ease, duration: basic2Duration } = getSpringEasing(
+const { easingFn: basic2Ease, duration: basic2Duration } = getSpringEasing(
   ixdEasing.spring.basic2
 );
-const { easeFunction: bounce2Ease, duration: bounce2Duration } = getSpringEasing(
+const { easingFn: bounce2Ease, duration: bounce2Duration } = getSpringEasing(
   ixdEasing.spring.bounce2
 );
-const { easeFunction: smallEase, duration: smallDuration } = getSpringEasing(
+const { easingFn: smallEase, duration: smallDuration } = getSpringEasing(
   ixdEasing.spring.small
 );
-const { easeFunction: mediumEase, duration: mediumDuration } = getSpringEasing(
+const { easingFn: mediumEase, duration: mediumDuration } = getSpringEasing(
   ixdEasing.spring.medium
 );
-const { easeFunction: largeEase, duration: largeDuration } = getSpringEasing(
+const { easingFn: largeEase, duration: largeDuration } = getSpringEasing(
   ixdEasing.spring.large
 );
-const { easeFunction: quickEase, duration: quickDuration } = getSpringEasing(
+const { easingFn: quickEase, duration: quickDuration } = getSpringEasing(
   ixdEasing.spring.quick
 );
-const { easeFunction: rapidEase, duration: rapidDuration } = getSpringEasing(
+const { easingFn: rapidEase, duration: rapidDuration } = getSpringEasing(
   ixdEasing.spring.rapid
 );
 
@@ -97,7 +98,7 @@ gsap.registerEffect({
   extendTimeline: true,
 });
 
-export * from "gsap-trial";
-export * from "gsap-trial/CustomEase";
-export * from "gsap-trial/ScrollTrigger";
-export * from "gsap-trial/SplitText";
+export * from "gsap";
+export * from "gsap/CustomEase";
+export * from "gsap/ScrollTrigger";
+// export * from "gsap/SplitText";
