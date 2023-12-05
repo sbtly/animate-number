@@ -134,8 +134,7 @@ export function AnimateNumber(props) {
 
   const presets = {
     slow: {
-      hideLoopEasing: spring.quick,
-      // hideLoopEasing: spring.small,
+      hideLoopEasing: spring.small,
       inEasing: spring.slow2,
       loopPreset: "slow",
       outStaggerDelay: 0.04,
@@ -170,12 +169,12 @@ export function AnimateNumber(props) {
   const shrinkEasing = presets[props.preset].shrinkEasing;
 
   const outStaggerDelay = presets[props.preset].outStaggerDelay;
-  const inStaggerDelay = presets[props.preset].inStaggerDelay;
+  const inStaggerDelay = presets[props.preset].inStaggerDelay + props.addInStaggerDelay;
   const loopingDuration = props.loopingDuration ?? 0.3; // 0.3? 0.4가 최소일듯
   const loopInDelay = 0.03;
 
 
-  const deps = [state, props.replay, props.rollAllDigits, props.quickMode, props.hidePreSuffixWhileMoving, props.loopingDuration, props.fontSize, props.fontColor, JSON.stringify(props.from), JSON.stringify(props.to), props.from, props.to, props.prefix, props.suffix, props.align, props.preset, props.delay] // toIsLargetThenFrom 안넣으면 from/to 바꿔도 div에 바로 반영이 안됨
+  const deps = [state, props.replay, props.rollAllDigits, props.quickMode, props.hidePreSuffixWhileMoving, props.loopingDuration, props.fontSize, props.fontColor, JSON.stringify(props.from), JSON.stringify(props.to), props.from, props.to, props.prefix, props.suffix, props.align, props.preset, props.delay, props.addInStaggerDelay] // toIsLargetThenFrom 안넣으면 from/to 바꿔도 div에 바로 반영이 안됨
   const key = JSON.stringify(deps.join("-"))
   console.log(key)
 
@@ -442,8 +441,8 @@ export function AnimateNumber(props) {
 
       gsap.set(toSplit.chars, { opacity: 0 });
       gsap.set(wrapperRef.current, {
-        // width: prefixWidth + fromValWidth + suffixWidth
-        width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
+        width: prefixWidth + fromValWidth + suffixWidth
+        // width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
       });
 
       props.align !== "right" &&
@@ -867,7 +866,7 @@ export function AnimateNumber(props) {
 
 // console.log(props.to?.toLocaleString())
   return (
-    <div style={{position: 'relative', display: 'flex', alignItems: 'center', width: '100%', height: '100%'}}>
+    <div style={{position: 'relative', display: 'flex', justifyContent: props.align === 'center' ? 'center' : props.align === 'left' ? 'start' : 'end', width: '100%', height: '100%'}}>
       <div
         // onClick={() => setState(!state)}
         key={key}
@@ -972,15 +971,21 @@ addPropertyControls(AnimateNumber, {
     type: ControlType.Boolean,
     defaultValue: false
   },
+  addInStaggerDelay: {
+    type: ControlType.Enum,
+    defaultValue: 0,
+    options: [0, 0.1, 0.3],
+    displaySegmentedControl: true,
+  },
   delay: {
     type: ControlType.Number,
-    defaultValue: 0.5,
+    defaultValue: 0,
     step: 0.1,
     displayStepper: true
   },
   loopingDuration: {
     type: ControlType.Number,
-    defaultValue: 0.3,
+    defaultValue: 0.9,
     step: 0.1,
     displayStepper: true
   },
@@ -1016,7 +1021,7 @@ addPropertyControls(AnimateNumber, {
   // },
   prefix: {
     type: ControlType.String,
-    defaultValue: "연 ",
+    defaultValue: "",
   },
   suffix: {
     type: ControlType.String,
