@@ -442,8 +442,8 @@ export function AnimateNumber(props) {
 
       gsap.set(toSplit.chars, { opacity: 0 });
       gsap.set(wrapperRef.current, {
-        width: prefixWidth + fromValWidth + suffixWidth
-        // width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
+        // width: prefixWidth + fromValWidth + suffixWidth
+        width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
       });
 
       props.align !== "right" &&
