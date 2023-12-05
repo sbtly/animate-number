@@ -442,8 +442,8 @@ export function AnimateNumber(props) {
 
       gsap.set(toSplit.chars, { opacity: 0 });
       gsap.set(wrapperRef.current, {
-        // width: prefixWidth + fromValWidth + suffixWidth
-        width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
+        width: prefixWidth + fromValWidth + suffixWidth
+        // width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
       });
 
       props.align !== "right" &&
@@ -697,19 +697,19 @@ export function AnimateNumber(props) {
         : (movePrefixToEndMotion.current = null);
 
       if (props.align === "center") {
-        // 프레이머에서만 width 바뀌는거 disable
-        changeWidthMotion.current = null;
-        // toIsLongerThenFrom
-        //   ? (changeWidthMotion.current = gsap.to(wrapperRef.current, {
-        //       width: prefixWidth + toValWidth + suffixWidth,
-        //       x: (toValWidth - fromValWidth) / 2,
-        //       duration: 0.001
-        //     }))
-        //   : (changeWidthMotion.current = gsap.to(wrapperRef.current, {
-        //       width: prefixWidth + toValWidth + suffixWidth,
-        //       x: 0,
-        //       duration: 0.001
-        //     }));
+        // // 프레이머에서만 width 바뀌는거 disable
+        // changeWidthMotion.current = null;
+        toIsLongerThenFrom
+          ? (changeWidthMotion.current = gsap.to(wrapperRef.current, {
+              width: prefixWidth + toValWidth + suffixWidth,
+              x: (toValWidth - fromValWidth) / 2,
+              duration: 0.001
+            }))
+          : (changeWidthMotion.current = gsap.to(wrapperRef.current, {
+              width: prefixWidth + toValWidth + suffixWidth,
+              x: 0,
+              duration: 0.001
+            }));
 
         toIsLongerThenFrom
           ? (repositionAllByAlignMotion.current = gsap.to(wrapperRef.current, {
@@ -724,27 +724,27 @@ export function AnimateNumber(props) {
             }));
       } else if (props.align === "right") {
         repositionAllByAlignMotion.current = null;
-        // 프레이머에서만 width, prefix 바뀌는거 disable
-        changeWidthMotion.current = null;
-        resetPrefixToEndMotion.current = null;
+        // // 프레이머에서만 width, prefix 바뀌는거 disable
+        // changeWidthMotion.current = null;
+        // resetPrefixToEndMotion.current = null;
 
-        // !toIsLongerThenFrom
-        //   ? (resetPrefixToEndMotion.current = gsap.to(q(`.${prefix}`), {
-        //       x: 0,
-        //       duration: 0.001
-        //     }))
-        //   : (resetPrefixToEndMotion.current = null);
+        !toIsLongerThenFrom
+          ? (resetPrefixToEndMotion.current = gsap.to(q(`.${prefix}`), {
+              x: 0,
+              duration: 0.001
+            }))
+          : (resetPrefixToEndMotion.current = null);
 
-        // toIsLongerThenFrom
-        //   ? (changeWidthMotion.current = gsap.to(wrapperRef.current, {
-        //       width: prefixWidth + toValWidth + suffixWidth,
-        //       duration: 0.001
-        //     }))
-        //   : (changeWidthMotion.current = gsap.to(wrapperRef.current, {
-        //       width: prefixWidth + toValWidth + suffixWidth,
-        //       x: 0,
-        //       duration: 0.001
-        //     }));
+        toIsLongerThenFrom
+          ? (changeWidthMotion.current = gsap.to(wrapperRef.current, {
+              width: prefixWidth + toValWidth + suffixWidth,
+              duration: 0.001
+            }))
+          : (changeWidthMotion.current = gsap.to(wrapperRef.current, {
+              width: prefixWidth + toValWidth + suffixWidth,
+              x: 0,
+              duration: 0.001
+            }));
       } else {
         // left 일 때
         repositionAllByAlignMotion.current = null;
@@ -867,7 +867,7 @@ export function AnimateNumber(props) {
 
 // console.log(props.to?.toLocaleString())
   return (
-    <>
+    <div style={{position: 'relative', display: 'flex', alignItems: 'center', width: '100%', height: '100%'}}>
       <div
         // onClick={() => setState(!state)}
         key={key}
@@ -884,7 +884,8 @@ export function AnimateNumber(props) {
         }}
       >
         <div ref={prefixRef} className={prefix}>
-          {props.prefix}&nbsp;
+          {/* {props.prefix}&nbsp; */}
+          {props.prefix}
         </div>
         <div
           style={{
@@ -950,7 +951,7 @@ export function AnimateNumber(props) {
           {props.suffix}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
