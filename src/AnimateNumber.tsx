@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState, useLayoutEffect, useMemo } from "react"
-import { addPropertyControls, ControlType } from "framer"
-import {gsap, springs as spring} from './utils/gsap/gsap'
+import { useEffect, useRef, useState, useLayoutEffect, useMemo } from "react";
+import { addPropertyControls, ControlType } from "framer";
+import { gsap, springs as spring } from "./utils/gsap/gsap";
 import SplitType from "split-type";
-import {css} from '@emotion/css'
+import { css } from "@emotion/css";
 
-import Loop from './Loop'
+import Loop from "./Loop";
 import {
   findCommaIndices,
   generatePositions,
@@ -20,7 +20,7 @@ import {
   convertStringToArray,
   isToLargerThenFromWithQuestionmark,
   calculateWidth,
-  getNumWidthsWhenBold
+  getNumWidthsWhenBold,
 } from "./utils/functions";
 
 const loopContainerStyle = css`
@@ -69,9 +69,9 @@ const suffix = css`
 `;
 
 export function AnimateNumber(props) {
-  const wrapperRef = useRef()
-  const prefixRef = useRef()
-  const suffixRef = useRef()
+  const wrapperRef = useRef();
+  const prefixRef = useRef();
+  const suffixRef = useRef();
 
   const q = useMemo(() => gsap.utils.selector(wrapperRef), [wrapperRef]);
 
@@ -79,7 +79,6 @@ export function AnimateNumber(props) {
   const [playLoop, setPlayLoop] = useState(false);
   // const [localeFrom, setLocaleFrom] = useState(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
   // const [localeTo, setLocaleTo] = useState(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','));
-
 
   const [resultFromArr, setResultFromArr] = useState([]);
   const [resultFromArrOnlyNum, setResultFromArrOnlyNum] = useState([]);
@@ -131,7 +130,6 @@ export function AnimateNumber(props) {
   const resultToShowLoops = ["diff", "show", "hide"];
   const numWidths = getNumWidthsWhenBold(props.fontSize);
 
-
   const presets = {
     slow: {
       hideLoopEasing: spring.small,
@@ -140,28 +138,30 @@ export function AnimateNumber(props) {
       outStaggerDelay: 0.04,
       inStaggerDelay: 0.04,
       expandEasing: spring.slow2,
-      shrinkEasing: spring.basic
+      shrinkEasing: spring.basic,
     },
     normal: {
       // hideLoopEasing: spring.small,
-      hideLoopEasing: spring.rapid,
+      hideLoopEasing: spring.quick,
       inEasing: spring.small,
-      loopPreset: "normal",
-      outStaggerDelay: 0.03,
-      inStaggerDelay: 0.03,
-      expandEasing: spring.basic,
-      shrinkEasing: spring.basic2
-    },
-    bounce: {
-      // hideLoopEasing: spring.small,
-      hideLoopEasing: spring.rapid,
-      inEasing: spring.bounce2,
+      // loopPreset: "normal",
       loopPreset: "fast",
       outStaggerDelay: 0.03,
       inStaggerDelay: 0.03,
+      expandEasing: spring.basic,
+      shrinkEasing: spring.basic2,
+    },
+    bounce: {
+      // hideLoopEasing: spring.small,
+      hideLoopEasing: spring.quick,
+      inEasing: spring.bounce2,
+      // loopPreset: "fast",
+      loopPreset: "faster",
+      outStaggerDelay: 0.03,
+      inStaggerDelay: 0.03,
       expandEasing: spring.basic2,
-      shrinkEasing: spring.basic2
-    }
+      shrinkEasing: spring.basic2,
+    },
   };
   const hideLoopEasing = presets[props.preset].hideLoopEasing;
   const inEasing = presets[props.preset].inEasing;
@@ -169,14 +169,36 @@ export function AnimateNumber(props) {
   const shrinkEasing = presets[props.preset].shrinkEasing;
 
   const outStaggerDelay = presets[props.preset].outStaggerDelay;
-  const inStaggerDelay = presets[props.preset].inStaggerDelay + props.addInStaggerDelay;
+  const inStaggerDelay =
+    presets[props.preset].inStaggerDelay + props.addInStaggerDelay;
   const loopingDuration = props.loopingDuration ?? 0.3; // 0.3? 0.4가 최소일듯
   const loopInDelay = 0.03;
 
+  const deps = [
+    props.please,
+    state,
+    props.replay,
+    props.rollAllDigits,
+    props.quickMode,
+    props.hidePreSuffixWhileMoving,
+    props.loopingDuration,
+    props.fontSize,
+    props.fontColor,
+    JSON.stringify(props.from),
+    JSON.stringify(props.to),
+    props.from,
+    props.to,
+    props.prefix,
+    props.suffix,
+    props.align,
+    props.preset,
+    props.delay,
+    props.addInStaggerDelay,
+  ]; // toIsLargetThenFrom 안넣으면 from/to 바꿔도 div에 바로 반영이 안됨
+  const key = JSON.stringify(deps.join("-"));
+  console.log(key);
 
-  const deps = [state, props.replay, props.rollAllDigits, props.quickMode, props.hidePreSuffixWhileMoving, props.loopingDuration, props.fontSize, props.fontColor, JSON.stringify(props.from), JSON.stringify(props.to), props.from, props.to, props.prefix, props.suffix, props.align, props.preset, props.delay, props.addInStaggerDelay] // toIsLargetThenFrom 안넣으면 from/to 바꿔도 div에 바로 반영이 안됨
-  const key = JSON.stringify(deps.join("-"))
-  console.log(key)
+  const [toArrOnlyNum, setToArrOnlyNum] = useState([]);
 
   useEffect(() => {
     // 쉼표, 마이너스, 온점 무시한 array도 만들어 - Loop 개수 & LoopStartNum 계산에 필요함 - 근데 물음표는 무시하면 안됨
@@ -185,19 +207,21 @@ export function AnimateNumber(props) {
     console.log(isNaN(props.from), isNaN(props.to));
     console.log(props.from, props.to);
     console.log(fromArrOnlyNum, toArrOnlyNum);
-
+    setToArrOnlyNum(toArrOnlyNum);
     // from, to 중에 뭐가 더 큰 값인지 판단 - 모션 up, down 방향에 사용될 기준 (물음표는 9로 대체)
-    setToIsLargerThenFrom(isToLargerThenFromWithQuestionmark(props.from, props.to));
+    setToIsLargerThenFrom(
+      isToLargerThenFromWithQuestionmark(props.from, props.to)
+    );
 
     // 쉼표 무시 안하고! 자릿수 array도 만들어
     const fromArr = isNaN(props.from)
       ? convertStringToArray(props.from)
       : props.from?.toLocaleString().split("");
-      // : props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ',').split("")
+    // : props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ',').split("")
     const toArr = isNaN(props.to)
       ? convertStringToArray(props.to)
       : props.to?.toLocaleString().split("");
-      // : props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ',').split("")
+    // : props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ',').split("")
     console.log(fromArr, toArr);
 
     // from, to 중 뭐가 더 긴지 판단 - 어디에 Loop 개수를 맞출지에 사용될 기준
@@ -233,11 +257,19 @@ export function AnimateNumber(props) {
 
     resultFromArrOnlyNum =
       props.align === "right"
-        ? getResultFromArrFromEnd(fromArrOnlyNum, toArrOnlyNum, props.rollAllDigits)
+        ? getResultFromArrFromEnd(
+            fromArrOnlyNum,
+            toArrOnlyNum,
+            props.rollAllDigits
+          )
         : getResultFromArr(fromArrOnlyNum, toArrOnlyNum, props.rollAllDigits);
     resultToArrOnlyNum =
       props.align === "right"
-        ? getResultToArrFromEnd(fromArrOnlyNum, toArrOnlyNum, props.rollAllDigits)
+        ? getResultToArrFromEnd(
+            fromArrOnlyNum,
+            toArrOnlyNum,
+            props.rollAllDigits
+          )
         : getResultToArr(fromArrOnlyNum, toArrOnlyNum, props.rollAllDigits);
 
     setResultFromArr(resultFromArr);
@@ -348,7 +380,6 @@ export function AnimateNumber(props) {
     // console.log("suffix pos: ", suffixFromPos, suffixLoadingPos, suffixEndPos);
   }, deps);
 
-
   // useEffect(() => {
   //   const a = new SplitType(wrapperRef.current, {type: 'chars'})
   //   tl.current = gsap.timeline().to(a.chars, {y: 20, stagger: 0.1})
@@ -362,7 +393,10 @@ export function AnimateNumber(props) {
       // from, to 값의 width 구하기 - suffix width가 왤케 안잡히지..
       // const fromValWidth = calculateWidth(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','), numWidths);
       // const toValWidth = calculateWidth(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','), numWidths);
-      const fromValWidth = calculateWidth(props.from.toLocaleString(), numWidths);
+      const fromValWidth = calculateWidth(
+        props.from.toLocaleString(),
+        numWidths
+      );
       const toValWidth = calculateWidth(props.to.toLocaleString(), numWidths);
       const prefixWidth = prefixRef.current.clientWidth;
       const suffixWidth = suffixRef.current.clientWidth;
@@ -441,7 +475,7 @@ export function AnimateNumber(props) {
 
       gsap.set(toSplit.chars, { opacity: 0 });
       gsap.set(wrapperRef.current, {
-        width: prefixWidth + fromValWidth + suffixWidth
+        width: prefixWidth + fromValWidth + suffixWidth,
         // width: prefixWidth + toValWidth + suffixWidth // framer에서만 toValWidth로 변경
       });
 
@@ -450,9 +484,8 @@ export function AnimateNumber(props) {
 
       tl.current = gsap.timeline({
         // paused: true,
-        delay: props.delay
+        delay: props.delay,
       });
-
 
       toIsLargerThenFrom
         ? (outFromCharsMotion.current = gsap.to(outFromChars, {
@@ -461,9 +494,9 @@ export function AnimateNumber(props) {
             opacity: 0,
             stagger: {
               from: props.align === "right" ? "end" : 0,
-              each: props.quickMode ? 0.03 : outStaggerDelay
+              each: props.quickMode ? 0.03 : outStaggerDelay,
             },
-            ...spring.small
+            ...spring.small,
           }))
         : props.quickMode
         ? (outFromCharsMotion.current = gsap.to(outFromChars, {
@@ -476,9 +509,9 @@ export function AnimateNumber(props) {
                 return resultFromArrOnlyNum[index] === "hide" // 퀵모드에서 28,834,229원에서 0원으로 될때, 원이 이동한 뒤로 out된 숫자들 잔상 보이는거 막기 위해 추가된 모션
                   ? 0
                   : index * (props.quickMode ? 0.03 : outStaggerDelay);
-              }
+              },
             },
-            ...spring.quick
+            ...spring.quick,
           }))
         : (outFromCharsMotion.current = gsap.to(outFromChars, {
             rotateX: -60,
@@ -486,14 +519,14 @@ export function AnimateNumber(props) {
             opacity: 0,
             stagger: {
               from: props.align === "right" ? "end" : 0,
-              each: props.quickMode ? 0.03 : outStaggerDelay
+              each: props.quickMode ? 0.03 : outStaggerDelay,
             },
-            ...spring.small
+            ...spring.small,
           }));
 
       outFromCommaMotion.current = gsap.to(outFromCommas, {
         opacity: 0,
-        ...spring.rapid
+        ...spring.rapid,
       });
 
       repositionLoopsMotion.current = gsap.to(q(`.${loopContainerStyle}`), {
@@ -502,29 +535,29 @@ export function AnimateNumber(props) {
             ? endPositionArrOnlyNum[loopIndices[i]]
             : fromPositionArrOnlyNum[loopIndices[i]];
         },
-        duration: 0
+        duration: 0,
       });
 
       showLoopsMotion.current = gsap.fromTo(
         q(`.${loopContainerStyle}`),
         {
-          opacity: 0
+          opacity: 0,
         },
         {
           opacity: 1,
           stagger: {
             from: props.align === "right" ? "end" : 0,
-            each: outStaggerDelay
+            each: outStaggerDelay,
           },
           delay: loopInDelay,
-          ...spring.rapid
+          ...spring.rapid,
         }
       );
 
       showToCommaMotion.current = gsap.fromTo(
         inToCommas,
         {
-          opacity: 0
+          opacity: 0,
         },
         {
           opacity: 1,
@@ -538,7 +571,7 @@ export function AnimateNumber(props) {
                   (props.quickMode ? 0.03 : inStaggerDelay);
           },
           // ...(props.quickMode ? quickModeEasing : expandEasing)
-          ...expandEasing
+          ...expandEasing,
         }
       );
 
@@ -548,9 +581,9 @@ export function AnimateNumber(props) {
             opacity: 0,
             stagger: {
               from: props.align === "right" ? "end" : 0,
-              each: inStaggerDelay
+              each: inStaggerDelay,
             },
-            ...hideLoopEasing
+            ...hideLoopEasing,
           }))
         : (hideLoopsMotion.current = gsap.to(q(`.${loopContainerStyle}`), {
             opacity: 0,
@@ -561,9 +594,9 @@ export function AnimateNumber(props) {
                 return resultFromArrOnlyNum[index] === "hide" // 28,834,229원에서 0원으로 될때, 원이 이동한 뒤로 loop이 보이는거 막기 위해 추가된 모션
                   ? 0
                   : index * inStaggerDelay;
-              }
+              },
             },
-            ...hideLoopEasing
+            ...hideLoopEasing,
           }));
 
       // 숫자가 늘어날땐 뒷자리가 너무 빨리 사라져서 공백이 보여서 별로라 줄어들때만
@@ -590,7 +623,7 @@ export function AnimateNumber(props) {
             return endPositionArrOnlyNum[i] - fromPositionArrOnlyNum[i];
           }
         },
-        ...(toIsLongerThenFrom ? expandEasing : shrinkEasing)
+        ...(toIsLongerThenFrom ? expandEasing : shrinkEasing),
         // ...(props.quickMode
         //   ? quickModeEasing
         //   : toIsLongerThenFrom
@@ -601,7 +634,7 @@ export function AnimateNumber(props) {
       repositionToCommaMotion.current = gsap.to(inToCommas, {
         x: 0,
         // ...(props.quickMode ? quickModeEasing : expandEasing)
-        ...expandEasing
+        ...expandEasing,
       });
 
       toIsLargerThenFrom
@@ -614,9 +647,9 @@ export function AnimateNumber(props) {
               y: "0%",
               stagger: {
                 from: props.align === "right" ? "end" : 0,
-                each: props.quickMode ? 0.03 : inStaggerDelay
+                each: props.quickMode ? 0.03 : inStaggerDelay,
               },
-              ...inEasing
+              ...inEasing,
             }
           ))
         : (showToCharsMotion.current = gsap.fromTo(
@@ -628,9 +661,9 @@ export function AnimateNumber(props) {
               y: "0%",
               stagger: {
                 from: props.align === "right" ? "end" : 0,
-                each: props.quickMode ? 0.03 : inStaggerDelay
+                each: props.quickMode ? 0.03 : inStaggerDelay,
               },
-              ...inEasing
+              ...inEasing,
             }
           ));
 
@@ -638,30 +671,30 @@ export function AnimateNumber(props) {
         if (props.align !== "right") {
           hidePreSuffixMotion.current = gsap.to(q(`.${suffix}`), {
             opacity: 0,
-            ...spring.rapid
+            ...spring.rapid,
           });
           showPreSuffixMotion.current = gsap.fromTo(
             q(`.${suffix}`),
             {
               x: toIsLongerThenFrom
                 ? suffixEndPosition - 6
-                : suffixEndPosition + 6
+                : suffixEndPosition + 6,
             },
             {
               opacity: 1,
               x: suffixEndPosition,
               immediateRender: false,
-              ...inEasing
+              ...inEasing,
             }
           );
         } else {
           hidePreSuffixMotion.current = gsap.to(q(`.${prefix}`), {
             opacity: 0,
-            ...spring.rapid
+            ...spring.rapid,
           });
           showPreSuffixMotion.current = gsap.to(q(`.${prefix}`), {
             opacity: 1,
-            ...spring.rapid
+            ...spring.rapid,
           });
         }
       } else {
@@ -678,7 +711,7 @@ export function AnimateNumber(props) {
             //   toIsLongerThenFrom
             //   ? 0
             //   : Math.max(0, endPositionArrOnlyNum.length - 2) * inStaggerDelay, // 28,845,249에서 12,911,141처럼 자릿수는 똑같은데 숫자폭이 줄어들어서 suffix가 당겨지는 경우, 이 delay가 없으면 suffix랑 loop이랑 겹쳐보임 - 근데 다시 없애보니 괜찮은거같아서 일단 없앰..
-            ...(toIsLongerThenFrom ? expandEasing : shrinkEasing)
+            ...(toIsLongerThenFrom ? expandEasing : shrinkEasing),
           }))
         : (moveSuffixToEndMotion.current = null);
 
@@ -687,11 +720,11 @@ export function AnimateNumber(props) {
           ? (movePrefixToEndMotion.current = gsap.from(q(`.${prefix}`), {
               x: toValWidth - fromValWidth,
               immediateRender: false,
-              ...expandEasing
+              ...expandEasing,
             }))
           : (movePrefixToEndMotion.current = gsap.to(q(`.${prefix}`), {
               x: fromValWidth - toValWidth,
-              ...shrinkEasing
+              ...shrinkEasing,
             }))
         : (movePrefixToEndMotion.current = null);
 
@@ -702,24 +735,24 @@ export function AnimateNumber(props) {
           ? (changeWidthMotion.current = gsap.to(wrapperRef.current, {
               width: prefixWidth + toValWidth + suffixWidth,
               x: (toValWidth - fromValWidth) / 2,
-              duration: 0.001
+              duration: 0.001,
             }))
           : (changeWidthMotion.current = gsap.to(wrapperRef.current, {
               width: prefixWidth + toValWidth + suffixWidth,
               x: 0,
-              duration: 0.001
+              duration: 0.001,
             }));
 
         toIsLongerThenFrom
           ? (repositionAllByAlignMotion.current = gsap.to(wrapperRef.current, {
               x: 0,
               // ...(props.quickMode ? quickModeEasing : expandEasing)
-              ...expandEasing
+              ...expandEasing,
             }))
           : (repositionAllByAlignMotion.current = gsap.to(wrapperRef.current, {
               x: (fromValWidth - toValWidth) / 2,
               // ...(props.quickMode ? quickModeEasing : shrinkEasing)
-              ...shrinkEasing
+              ...shrinkEasing,
             }));
       } else if (props.align === "right") {
         repositionAllByAlignMotion.current = null;
@@ -730,19 +763,19 @@ export function AnimateNumber(props) {
         !toIsLongerThenFrom
           ? (resetPrefixToEndMotion.current = gsap.to(q(`.${prefix}`), {
               x: 0,
-              duration: 0.001
+              duration: 0.001,
             }))
           : (resetPrefixToEndMotion.current = null);
 
         toIsLongerThenFrom
           ? (changeWidthMotion.current = gsap.to(wrapperRef.current, {
               width: prefixWidth + toValWidth + suffixWidth,
-              duration: 0.001
+              duration: 0.001,
             }))
           : (changeWidthMotion.current = gsap.to(wrapperRef.current, {
               width: prefixWidth + toValWidth + suffixWidth,
               x: 0,
-              duration: 0.001
+              duration: 0.001,
             }));
       } else {
         // left 일 때
@@ -750,11 +783,11 @@ export function AnimateNumber(props) {
         toIsLongerThenFrom
           ? (changeWidthMotion.current = gsap.to(wrapperRef.current, {
               width: prefixWidth + toValWidth + suffixWidth,
-              duration: 0.001
+              duration: 0.001,
             }))
           : (changeWidthMotion.current = gsap.to(wrapperRef.current, {
               width: prefixWidth + toValWidth + suffixWidth,
-              duration: 0.001
+              duration: 0.001,
             }));
       }
 
@@ -856,17 +889,30 @@ export function AnimateNumber(props) {
   }, deps);
 
   useEffect(() => {
-    setState(!state)
-  }, [] )
+    setState(!state);
+  }, []);
 
   // useEffect(() => {
   //   setLocaleFrom(props.from?.replace(/\B(?=(\d{3})+(?!\d))/g, ','))
   //   setLocaleTo(props.to?.replace(/\B(?=(\d{3})+(?!\d))/g, ','))
   // }, [props.from, props.to])
 
-// console.log(props.to?.toLocaleString())
+  // console.log(props.to?.toLocaleString())
   return (
-    <div style={{position: 'relative', display: 'flex', justifyContent: props.align === 'center' ? 'center' : props.align === 'left' ? 'start' : 'end', width: '100%', height: '100%'}}>
+    <div
+      style={{
+        position: "relative",
+        display: "flex",
+        justifyContent:
+          props.align === "center"
+            ? "center"
+            : props.align === "left"
+            ? "start"
+            : "end",
+        width: "100%",
+        height: "100%",
+      }}
+    >
       <div
         // onClick={() => setState(!state)}
         key={key}
@@ -874,11 +920,11 @@ export function AnimateNumber(props) {
         style={{
           position: "relative",
           fontSize: props.fontSize,
-          fontWeight: 'bold',
+          fontWeight: "bold",
           color: props.fontColor,
-          fontFamily: 'Toss Product Sans',
+          fontFamily: "Toss Product Sans",
           // border: "1px solid red",
-          display: "flex"
+          display: "flex",
           // maxWidth: "fit-content"
         }}
       >
@@ -892,14 +938,14 @@ export function AnimateNumber(props) {
             display: "flex",
             ...(props.align === "right" && {
               flex: 1,
-              justifyContent: "end"
-            })
+              justifyContent: "end",
+            }),
           }}
         >
           <div
             className={fromNum}
             style={{
-              left: props.align === "right" ? "unset" : 0
+              left: props.align === "right" ? "unset" : 0,
               // color: "red"
             }}
           >
@@ -914,7 +960,7 @@ export function AnimateNumber(props) {
               display: "flex",
               flexDirection: "column",
               top: 0,
-              left: 0
+              left: 0,
             }}
           >
             {!props.quickMode &&
@@ -926,6 +972,8 @@ export function AnimateNumber(props) {
                     preset={presets[props.preset].loopPreset}
                     fontSize={props.fontSize}
                     startNum={n}
+                    please={props.please}
+                    endNum={toArrOnlyNum[loopIndices[i]]}
                     // align에 따라서 stagger 시작하는 순서도 반대로 해줘야 함
                     startStaggerDelay={
                       props.align === "right"
@@ -951,25 +999,29 @@ export function AnimateNumber(props) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 addPropertyControls(AnimateNumber, {
   replay: {
     type: ControlType.Boolean,
-    defaultValue: true
+    defaultValue: true,
   },
   rollAllDigits: {
     type: ControlType.Boolean,
-    defaultValue: false
+    defaultValue: false,
   },
   quickMode: {
     type: ControlType.Boolean,
-    defaultValue: false
+    defaultValue: false,
   },
   hidePreSuffixWhileMoving: {
     type: ControlType.Boolean,
-    defaultValue: false
+    defaultValue: false,
+  },
+  please: {
+    type: ControlType.Boolean,
+    defaultValue: false,
   },
   addInStaggerDelay: {
     type: ControlType.Enum,
@@ -981,35 +1033,35 @@ addPropertyControls(AnimateNumber, {
     type: ControlType.Number,
     defaultValue: 0,
     step: 0.1,
-    displayStepper: true
+    displayStepper: true,
   },
   loopingDuration: {
     type: ControlType.Number,
     defaultValue: 0.9,
     step: 0.1,
-    displayStepper: true
+    displayStepper: true,
   },
   fontSize: {
     type: ControlType.Number,
     defaultValue: 24,
     step: 1,
-    displayStepper: true
+    displayStepper: true,
   },
   fontColor: {
     type: ControlType.Color,
-    defaultValue: '#3182F6'
+    defaultValue: "#3182F6",
   },
   from: {
     type: ControlType.Number,
     defaultValue: 0,
     step: 1,
-    displayStepper: true
+    displayStepper: true,
   },
   to: {
     type: ControlType.Number,
     defaultValue: 1000,
     step: 1,
-    displayStepper: true
+    displayStepper: true,
   },
   // from: {
   //   type: ControlType.String,
@@ -1038,5 +1090,5 @@ addPropertyControls(AnimateNumber, {
     defaultValue: "normal",
     options: ["normal", "slow", "bounce"],
     displaySegmentedControl: true,
-  }
-})
+  },
+});

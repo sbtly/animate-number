@@ -622,7 +622,7 @@ graceful-fs@^4.1.6, graceful-fs@^4.2.0:
 
 gsap@./gsap-bonus.tgz:
   version "3.12.3"
-  resolved "./gsap-bonus.tgz#d0c67e578d529a26719fb83e1bc8644210755430"
+  resolved "./gsap-bonus.tgz#a6123d1677b73f5bc1b84f493893f3e72b295375"
 
 has-cors@1.1.0:
   version "1.1.0"

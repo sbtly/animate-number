@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useLayoutEffect, useMemo } from "react";
-import {gsap} from './utils/gsap/gsap'
+import { gsap } from "./utils/gsap/gsap";
 import { css } from "@emotion/css";
 
 const loopContainerStyle = css`
@@ -40,7 +40,7 @@ export default function Loop(props) {
       duration: 0.6,
       repeatDelay: 1.2,
       ease: "out",
-      y: 70
+      y: 70,
       // staggerDelay: 0.26,
       // duration: 0.6,
       // repeatDelay: 2,
@@ -52,26 +52,52 @@ export default function Loop(props) {
       duration: 0.5,
       repeatDelay: 0.9,
       ease: "out",
-      y: 100
+      y: 100,
     },
     fast: {
       staggerDelay: 0.13,
       duration: 0.4,
       repeatDelay: 0.8,
       ease: "out",
-      y: 110
-    }
+      y: 110,
+    },
+    faster: {
+      staggerDelay: 0.12,
+      duration: 0.35,
+      repeatDelay: 0.7,
+      ease: "out",
+      y: 110,
+    },
   };
 
   const preset = easings[props.preset];
   // console.log("preset: ", preset);
+
+  const baseNumWidths = {
+    "0": 6.695,
+    "1": 4.602,
+    "2": 6.125,
+    "3": 6.359,
+    "4": 6.352,
+    "5": 6.234,
+    "6": 6.438,
+    "7": 5.594,
+    "8": 6.617,
+    "9": 6.438,
+    "-": 4.641,
+    ",": 3.047,
+    ".": 2.742,
+    "?": 5.203,
+    "？": 8.656,
+  };
+  const number1Width = 4.948 * 1.1;
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
       animation.current = gsap.timeline({
         paused: true,
         delay: props.startStaggerDelay,
-        defaults: { ease: preset.ease, duration: preset.duration }
+        defaults: { ease: preset.ease, duration: preset.duration },
       });
 
       if (dir === "up") {
@@ -80,9 +106,18 @@ export default function Loop(props) {
             .timeline({
               // paused: true,
               repeat: repeatCount,
-              repeatDelay: preset.repeatDelay
+              repeatDelay: preset.repeatDelay,
             })
             .addLabel("start")
+            // .set(
+            //   target,
+            //   {
+            //     scaleX:
+            //       props.endNum === "1" ? number1Width / baseNumWidths[i] : 1,
+            //     // color: props.endNum === "1" ? "red" : "black",
+            //   },
+            //   "start"
+            // )
             .fromTo(
               target,
               { rotateX: 80, y: `${preset.y}%` },
@@ -117,9 +152,18 @@ export default function Loop(props) {
             .timeline({
               // paused: true,
               repeat: repeatCount,
-              repeatDelay: preset.repeatDelay
+              repeatDelay: preset.repeatDelay,
             })
             .addLabel("start")
+            // .set(
+            //   target,
+            //   {
+            //     scaleX:
+            //       props.endNum === "1" ? number1Width / baseNumWidths[i] : 1,
+            //     // color: props.endNum === "1" ? "red" : "black",
+            //   },
+            //   "start"
+            // )
             .fromTo(
               target,
               { rotateX: -80, y: `${-preset.y}%` },
@@ -163,19 +207,138 @@ export default function Loop(props) {
     <>
       <div
         className={loopContainerStyle}
-        style={{ fontSize: props.fontSize, fontFamily: 'Toss Product Sans', ...props.style }}
+        style={{
+          fontSize: props.fontSize,
+          fontFamily: "Toss Product Sans",
+          // alignItems: props.please
+          //   ? props.endNum === "1"
+          //     ? "start"
+          //     : "end"
+          //   : "start",
+          ...props.style,
+        }}
         ref={wrapperRef}
       >
-        <div className={loopStyle}>0</div>
-        <div className={loopStyle}>1</div>
-        <div className={loopStyle}>2</div>
-        <div className={loopStyle}>3</div>
-        <div className={loopStyle}>4</div>
-        <div className={loopStyle}>5</div>
-        <div className={loopStyle}>6</div>
-        <div className={loopStyle}>7</div>
-        <div className={loopStyle}>8</div>
-        <div className={loopStyle}>9</div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          0
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          1
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          2
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          3
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          4
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          5
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          6
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          7
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          8
+        </div>
+        <div
+          className={loopStyle}
+          // style={{
+          //   textAlign: props.please
+          //     ? props.endNum === "1"
+          //       ? "left"
+          //       : "right"
+          //     : "left",
+          // }}
+        >
+          9
+        </div>
 
         <span
           style={{
@@ -183,7 +346,7 @@ export default function Loop(props) {
             opacity: 0,
             paddingTop: "10%",
             paddingBottom: "10%",
-            position: "relative"
+            position: "relative",
           }}
         >
           0
