@@ -135,8 +135,10 @@ export function AnimateNumber(props) {
       hideLoopEasing: spring.small,
       inEasing: spring.slow2,
       loopPreset: "slow",
-      outStaggerDelay: 0.04,
-      inStaggerDelay: 0.04,
+      outStaggerDelay: 0.05,
+      inStaggerDelay: 0.05,
+      // outStaggerDelay: 0.04,
+      // inStaggerDelay: 0.04,
       expandEasing: spring.slow2,
       shrinkEasing: spring.basic,
     },
@@ -157,8 +159,10 @@ export function AnimateNumber(props) {
       inEasing: spring.bounce2,
       // loopPreset: "fast",
       loopPreset: "faster",
-      outStaggerDelay: 0.03,
-      inStaggerDelay: 0.03,
+      // outStaggerDelay: 0.03,
+      // inStaggerDelay: 0.03,
+      outStaggerDelay: 0.04,
+      inStaggerDelay: 0.04,
       expandEasing: spring.basic2,
       shrinkEasing: spring.basic2,
     },
@@ -968,8 +972,10 @@ export function AnimateNumber(props) {
                 return (
                   <Loop
                     key={i}
+                    i={i}
                     play={playLoop}
-                    preset={presets[props.preset].loopPreset}
+                    // preset={presets[props.preset].loopPreset}
+                    preset={i%2 === 0 ? 'faster' : 'fast'}
                     fontSize={props.fontSize}
                     startNum={n}
                     please={props.please}

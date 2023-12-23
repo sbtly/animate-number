@@ -91,6 +91,11 @@ export default function Loop(props) {
     "？": 8.656,
   };
   const number1Width = 4.948 * 1.1;
+  const random = props.please ? props.i % 2 === 0 ? 0 : 0.0255 : 0;
+  // const random = props.please ? gsap.utils.random(0, 0.02) : 0;
+  const staggerDelay = preset.staggerDelay + random;
+  const repeatDelay = preset.repeatDelay + random * 10;
+
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
@@ -106,7 +111,8 @@ export default function Loop(props) {
             .timeline({
               // paused: true,
               repeat: repeatCount,
-              repeatDelay: preset.repeatDelay,
+              repeatDelay: repeatDelay,
+              // repeatDelay: preset.repeatDelay,
             })
             .addLabel("start")
             // .set(
@@ -144,7 +150,8 @@ export default function Loop(props) {
               : props.startNum > i
               ? i - props.startNum + 10
               : i - props.startNum;
-          animation.current?.add(tl, preset.staggerDelay * startIndex);
+          animation.current?.add(tl, staggerDelay * startIndex);
+          // animation.current?.add(tl, preset.staggerDelay * startIndex);
         });
       } else {
         q(`.${loopStyle}`).forEach((target, i) => {
@@ -152,7 +159,8 @@ export default function Loop(props) {
             .timeline({
               // paused: true,
               repeat: repeatCount,
-              repeatDelay: preset.repeatDelay,
+              repeatDelay: repeatDelay,
+              // repeatDelay: preset.repeatDelay,
             })
             .addLabel("start")
             // .set(
@@ -190,14 +198,15 @@ export default function Loop(props) {
               : props.startNum > i
               ? i - props.startNum + 10
               : i - props.startNum;
-          animation.current?.add(tl, preset.staggerDelay * startIndex);
+          animation.current?.add(tl, staggerDelay * startIndex);
+          // animation.current?.add(tl, preset.staggerDelay * startIndex);
         });
       }
     });
     return () => {
       ctx.revert();
     };
-  }, [props.startNum, props.startStaggerDelay, dir, preset]);
+  }, [props.startNum, props.startStaggerDelay, dir, preset, staggerDelay, repeatDelay]);
 
   useEffect(() => {
     animation.current?.restart(true, false);
