@@ -33,6 +33,9 @@ const { easingFn: basic2Ease, duration: basic2Duration } = getSpringEasing(
 const { easingFn: bounce2Ease, duration: bounce2Duration } = getSpringEasing(
   ixdEasing.spring.bounce2
 );
+const { easingFn: bounce3Ease, duration: bounce3Duration } = getSpringEasing(
+  ixdEasing.spring.bounce3
+);
 const { easingFn: smallEase, duration: smallDuration } = getSpringEasing(
   ixdEasing.spring.small
 );
@@ -69,6 +72,10 @@ export const springs = {
   bounce2: {
     ease: bounce2Ease,
     duration: bounce2Duration,
+  },
+  bounce3: {
+    ease: bounce3Ease,
+    duration: bounce3Duration,
   },
   small: {
     ease: smallEase,

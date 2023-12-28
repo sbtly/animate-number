@@ -20,7 +20,9 @@ export const ixdEasing = {
     slow2: { stiffness: 190, damping: 30 },
     rapid: { stiffness: 1000, damping: 55 },
     bounce: { stiffness: 300, damping: 15 },
-    bounce2: { stiffness: 300, damping: 20 },
+    bounce2: { stiffness: 180, damping: 22 },
+    bounce3: { stiffness: 300, damping: 20 },
+    // bounce3: { stiffness: 300, damping: 20 },
     // elastic: { stiffness: 200, damping: 2 },
   },
 };
