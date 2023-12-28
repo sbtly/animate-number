@@ -553,8 +553,8 @@ export function returnStackItemsLoop(
   let endNum;
   // console.log(isNaN(Number(startNumProp)));
   if (isNaN(Number(startNumProp)) && isNaN(Number(endNumProp))) {
-    startNum = "0";
-    endNum = "9";
+    startNum = toIsLargerThenFrom ? "0" : "9";
+    endNum = toIsLargerThenFrom ? "9" : "0";
   } else if (isNaN(Number(startNumProp))) {
     startNum = "0";
     endNum = endNumProp;

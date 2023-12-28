@@ -125,7 +125,7 @@ export function AnimateNumber2(props) {
 
   const presets = {
     quickNormal: {
-      stagger: 0.03,
+      stagger: 0.035,
       hideStagger: 0.01,
       stackEasing: spring.medium,
       // moveEasing: spring.small,
@@ -149,7 +149,7 @@ export function AnimateNumber2(props) {
       },
     },
     quickBounce: {
-      stagger: 0.03,
+      stagger: 0.035,
       hideStagger: 0.01,
       stackEasing: spring.bounce3,
       // moveEasing: spring.small,
@@ -902,7 +902,10 @@ export function AnimateNumber2(props) {
           stagger *
           countStagger(
             resultToArrOnlyNum,
-            showCommaTargetIndices[i],
+            // showCommaTargetIndices[i],
+            toHasDash
+              ? showCommaTargetIndices[i] - 2
+              : showCommaTargetIndices[i] - 1,
             props.align
           ),
       });
@@ -926,10 +929,12 @@ export function AnimateNumber2(props) {
           delay:
             dashResult === "hide" && hideStacks.length !== 0
               ? 0
+              : dashResult === "show" && prefixText === ""
+              ? stagger * countStagger(resultToArrOnlyNum, 0, props.align)
               : resultFromArrOnlyNum.length === resultToArrOnlyNum.length
               ? stagger * countStagger(resultFromArrOnlyNum, 0, props.align)
               : toHasLongerWidthThenFrom
-              ? stagger * countStagger(resultFromArr, 0, props.align)
+              ? stagger * countStagger(resultFromArrOnlyNum, 0, props.align)
               : hideStacks.length === 0
               ? stagger * countStagger(resultToArr, 0, props.align)
               : props.mode === "custom"
@@ -968,7 +973,7 @@ export function AnimateNumber2(props) {
           {
             x:
               dashResult === "show"
-                ? props.align === "right"
+                ? props.align === "right" && prefixText !== ""
                   ? toValWidth - fromValWidth
                   : 0
                 : 0,
@@ -1007,9 +1012,15 @@ export function AnimateNumber2(props) {
                       fromHasDash ? fromDotIndex - 2 : fromDotIndex - 1,
                       props.align
                     )
-                  : countStagger(
+                  : fromDotIndex < toDotIndex
+                  ? countStagger(
                       resultFromArrOnlyNum,
-                      fromHasDash ? fromDotIndex - 2 : fromDotIndex - 1,
+                      resultFromArrOnlyNum.length,
+                      props.align
+                    )
+                  : countStagger(
+                      resultToArrOnlyNum,
+                      toHasDash ? toDotIndex - 2 : toDotIndex - 1,
                       props.align
                     )),
         })
