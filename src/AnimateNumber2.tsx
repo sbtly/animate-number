@@ -92,6 +92,10 @@ export function AnimateNumber2(props) {
   const [toIsLargerThenFrom, setToIsLargerThenFrom] = useState();
 
   const tl = useRef();
+  const masterTl = useRef();
+  const loadingTl = useRef();
+
+  const resetAfterLoading = useRef();
 
   const initialSetMotions = useRef();
   const moveFromSameCharsToEndMotion = useRef();
@@ -278,6 +282,8 @@ export function AnimateNumber2(props) {
   const deps = [
     state,
     props.replay,
+    props.loading,
+    props.loadingDuration,
     props.rollAllDigits,
     props.mode,
     props.loopCount,
@@ -691,7 +697,7 @@ export function AnimateNumber2(props) {
           "start"
         )
         .set(toSplit.chars, { opacity: 0 }, "start")
-        .set(fromSplitDiffNumbers, { opacity: 0 }, "start")
+        .set(fromSplitDiffNumbers, { opacity: props.loading ? 1 : 0 }, "start")
         .set(
           showStacks,
           {
@@ -707,7 +713,7 @@ export function AnimateNumber2(props) {
         .set(
           sameStacks,
           {
-            opacity: 1,
+            opacity: props.loading ? 0 : 1,
             x: (i) => {
               // console.log(i, sameStacksIndices[i], fromPositionArrOnlyNum);
               return props.align === "right" &&
@@ -724,6 +730,7 @@ export function AnimateNumber2(props) {
         .set(
           hideStacks,
           {
+            opacity: props.loading ? 0 : 1,
             // x: (i) => fromPositionArrOnlyNum[hideStacksIndices[i]]
             x: (i) =>
               props.align === "right" &&
@@ -745,11 +752,34 @@ export function AnimateNumber2(props) {
         );
 
       // 모션 시작
+      masterTl.current = gsap.timeline({ paused: true });
+      loadingTl.current = props.loading
+        ? gsap.timeline().to(fromSplit.chars, {
+            opacity: 0.2,
+            duration: 0.8,
+            stagger: {
+              each: 0.1,
+              repeat: -1,
+              ease: "none",
+              yoyoEase: true,
+            },
+          })
+        : null;
+
+      resetAfterLoading.current = gsap
+        .timeline({ defaults: { ease: "none", duration: 0.1 } })
+        .to(fromSplit.chars, { opacity: 1 })
+        .to(fromSplitDiffNumbers, { opacity: 0 }, 0)
+        .to(sameStacks, { opacity: 1 }, 0)
+        .to(hideStacks, { opacity: 1 }, 0);
 
       tl.current = gsap.timeline({
-        paused: true,
-        delay: delay,
-        onStart: () => setPlayLoop(!playLoop),
+        // paused: true,
+        // delay: delay,
+        onStart: () => {
+          setPlayLoop(!playLoop);
+          loadingTl.current?.pause();
+        },
       });
 
       moveFromSameCharsToEndMotion.current =
@@ -929,7 +959,7 @@ export function AnimateNumber2(props) {
           delay:
             dashResult === "hide" && hideStacks.length !== 0
               ? 0
-              : dashResult === "show" && prefixText === ""
+              : dashResult === "show" && props.prefix === ""
               ? stagger * countStagger(resultToArrOnlyNum, 0, props.align)
               : resultFromArrOnlyNum.length === resultToArrOnlyNum.length
               ? stagger * countStagger(resultFromArrOnlyNum, 0, props.align)
@@ -973,7 +1003,7 @@ export function AnimateNumber2(props) {
           {
             x:
               dashResult === "show"
-                ? props.align === "right" && prefixText !== ""
+                ? props.align === "right" && props.prefix !== ""
                   ? toValWidth - fromValWidth
                   : 0
                 : 0,
@@ -1235,7 +1265,7 @@ export function AnimateNumber2(props) {
             )
         : (repositionAllWhenAlignRightMotion.current = null);
 
-      console.log(hideStacks);
+      // console.log(hideStacks);
       props.align !== "right"
         ? (moveSuffixToEndMotion.current = gsap.to(suffixRef.current, {
             x: suffixEndPosition,
@@ -1306,7 +1336,14 @@ export function AnimateNumber2(props) {
         .add(repositionAllWhenAlignRightMotion.current, "endMotion") // align right일때만 쓰임
         .add(repositionAllWhenAlignCenterMotion.current, "endMotion"); // align right일때만 쓰임
 
-      tl.current?.pause(0);
+      masterTl.current
+        ?.add(loadingTl.current)
+        .add(
+          resetAfterLoading.current,
+          props.loading ? props.loadingDuration : delay
+        )
+        .add(tl.current);
+      masterTl.current?.pause(0);
     });
 
     return () => {
@@ -1316,7 +1353,7 @@ export function AnimateNumber2(props) {
 
   useEffect(() => {
     console.log("restart");
-    tl.current?.restart(true, false);
+    masterTl.current?.restart(true, false);
     setResetLoop(!resetLoop);
   }, deps);
 
@@ -1403,6 +1440,7 @@ export function AnimateNumber2(props) {
                 mode={props.mode}
                 loopCount={loopCount}
                 stackEasing={stackEasing}
+                isHideStack={resultArrOnlyNum[n] === "hide"}
                 // align에 따라서 stagger 시작하는 순서도 반대로 해줘야 함
                 startStaggerDelay={
                   resultArrOnlyNum[n] === "hide"
@@ -1424,6 +1462,7 @@ export function AnimateNumber2(props) {
         <div ref={suffixRef} className={suffix}>
           {props.suffix}
         </div>
+        <div style={{ opacity: 0 }}>0</div>
       </div>
     </div>
   );
@@ -1435,6 +1474,18 @@ addPropertyControls(AnimateNumber2, {
     defaultValue: true,
     enabledTitle: "▶️",
     disabledTitle: "▶️",
+  },
+  loading: {
+    type: ControlType.Boolean,
+    defaultValue: false,
+    enabledTitle: "ON",
+    disabledTitle: "OFF",
+  },
+  loadingDuration: {
+    type: ControlType.Number,
+    defaultValue: 3,
+    step: 0.5,
+    displayStepper: true,
   },
   delay: {
     type: ControlType.Number,

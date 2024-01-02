@@ -4,9 +4,8 @@ import { gsap, springs as spring } from "./utils/gsap/gsap";
 import { css } from "@emotion/css";
 import {
   returnStackItemsLoop,
-  returnStackItemsRepeat
+  returnStackItemsRepeat,
 } from "./utils/stack-functions";
-
 
 export const stack = css`
   position: absolute;
@@ -56,19 +55,19 @@ export default function Stack(props) {
     let ctx = gsap.context(() => {
       tl.current = gsap.timeline({
         paused: true,
-        delay: props.startStaggerDelay
+        delay: props.startStaggerDelay,
       });
 
       rollMotion.current =
-        (props.mode === "quickNormal" || props.mode === 'quickBounce')
+        props.mode === "quickNormal" || props.mode === "quickBounce"
           ? gsap.fromTo(
               wrapperRef.current,
               {
-                yPercent: props.toIsLargerThenFrom ? 0 : -(100 - 100 / 2)
+                yPercent: props.toIsLargerThenFrom ? 0 : -(100 - 100 / 2),
               },
               {
                 yPercent: props.toIsLargerThenFrom ? -(100 - 100 / 2) : 0,
-                ...props.stackEasing
+                ...props.stackEasing,
               }
             )
           : gsap.fromTo(
@@ -76,13 +75,13 @@ export default function Stack(props) {
               {
                 yPercent: props.toIsLargerThenFrom
                   ? 0
-                  : -(100 - 100 / arr?.length)
+                  : -(100 - 100 / arr?.length),
               },
               {
                 yPercent: props.toIsLargerThenFrom
                   ? -(100 - 100 / arr?.length)
                   : 0,
-                ...props.stackEasing
+                ...props.stackEasing,
               }
             );
 
@@ -97,7 +96,7 @@ export default function Stack(props) {
     props.mode,
     // props.loopCount,
     props.toIsLargerThenFrom,
-    props.stackEasing
+    props.stackEasing,
   ]);
 
   useEffect(() => {
@@ -111,12 +110,28 @@ export default function Stack(props) {
   return (
     <div className={stack} style={{ ...props.style }}>
       <div ref={wrapperRef} className={stackContainer}>
-        {(props.mode === "quickNormal" || props.mode === 'quickBounce' ) ? (
+        {props.mode === "quickNormal" || props.mode === "quickBounce" ? (
           <>
-            <div>
+            <div
+              style={{
+                opacity: props.toIsLargerThenFrom
+                  ? 1
+                  : props.isHideStack
+                  ? 0
+                  : 1,
+              }}
+            >
               {props.toIsLargerThenFrom ? props.startNum : props.endNum}
             </div>
-            <div>
+            <div
+              style={{
+                opacity: props.toIsLargerThenFrom
+                  ? props.isHideStack
+                    ? 0
+                    : 1
+                  : 1,
+              }}
+            >
               {props.toIsLargerThenFrom ? props.endNum : props.startNum}
             </div>
           </>
