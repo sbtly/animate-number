@@ -3325,7 +3325,7 @@ function AnimateNumber2(props) {
     ref: suffixRef,
     className: suffix
   }, props.suffix), /* @__PURE__ */ React.createElement("div", {
-    style: { opacity: 0 }
+    style: { opacity: 0, width: 0 }
   }, "0")));
 }
 addPropertyControls(AnimateNumber2, {
