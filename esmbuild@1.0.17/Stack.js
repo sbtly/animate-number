@@ -2021,7 +2021,15 @@ function Stack(props) {
   }, /* @__PURE__ */ React.createElement("div", {
     ref: wrapperRef,
     className: stackContainer
-  }, props.mode === "quickNormal" || props.mode === "quickBounce" ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", null, props.toIsLargerThenFrom ? props.startNum : props.endNum), /* @__PURE__ */ React.createElement("div", null, props.toIsLargerThenFrom ? props.endNum : props.startNum)) : arr == null ? void 0 : arr.map((n, i) => {
+  }, props.mode === "quickNormal" || props.mode === "quickBounce" ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", {
+    style: {
+      opacity: props.toIsLargerThenFrom ? 1 : props.isHideStack ? 0 : 1
+    }
+  }, props.toIsLargerThenFrom ? props.startNum : props.endNum), /* @__PURE__ */ React.createElement("div", {
+    style: {
+      opacity: props.toIsLargerThenFrom ? props.isHideStack ? 0 : 1 : 1
+    }
+  }, props.toIsLargerThenFrom ? props.endNum : props.startNum)) : arr == null ? void 0 : arr.map((n, i) => {
     return /* @__PURE__ */ React.createElement("div", {
       key: i
     }, n);

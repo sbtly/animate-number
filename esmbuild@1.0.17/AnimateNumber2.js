@@ -2770,6 +2770,9 @@ function AnimateNumber2(props) {
   const [loopEndNums, setLoopEndNums] = useState([]);
   const [toIsLargerThenFrom, setToIsLargerThenFrom] = useState();
   const tl = useRef();
+  const masterTl = useRef();
+  const loadingTl = useRef();
+  const resetAfterLoading = useRef();
   const initialSetMotions = useRef();
   const moveFromSameCharsToEndMotion = useRef();
   const moveStacksToEndMotion = useRef();
@@ -2915,6 +2918,8 @@ function AnimateNumber2(props) {
   const deps = [
     state,
     props.replay,
+    props.loading,
+    props.loadingDuration,
     props.rollAllDigits,
     props.mode,
     props.loopCount,
@@ -2991,7 +2996,7 @@ function AnimateNumber2(props) {
   }, deps);
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      var _a2, _b2, _c2, _d2, _e;
+      var _a2, _b2, _c2, _d2, _e, _f;
       const fromValWidth = calculateWidth(isNaN(from) ? addCommasToString(from) : from.toLocaleString(), numWidths);
       const toValWidth = calculateWidth(isNaN(to) ? addCommasToString(to) : to.toLocaleString(), numWidths);
       const toHasLongerWidthThenFrom = fromValWidth < toValWidth;
@@ -3106,23 +3111,38 @@ function AnimateNumber2(props) {
       initialSetMotions.current = gsap.timeline();
       (_c2 = initialSetMotions.current) == null ? void 0 : _c2.addLabel("start").fromTo(wrapperRef.current, { opacity: 1 }, { opacity: 1, duration: 1e-3 }, "start").set(wrapperRef.current, {
         width: prefixWidth + fromValWidth + suffixWidth
-      }, "start").set(toSplit.chars, { opacity: 0 }, "start").set(fromSplitDiffNumbers, { opacity: 0 }, "start").set(showStacks, {
+      }, "start").set(toSplit.chars, { opacity: 0 }, "start").set(fromSplitDiffNumbers, { opacity: props.loading ? 1 : 0 }, "start").set(showStacks, {
         opacity: 0,
         x: (i) => props.align === "right" && !toHasLongerWidthThenFrom ? endPositionArrOnlyNum[showStacksIndices[i]] + (fromValWidth - toValWidth) : endPositionArrOnlyNum[showStacksIndices[i]]
       }, "start").set(sameStacks, {
-        opacity: 1,
+        opacity: props.loading ? 0 : 1,
         x: (i) => {
           return props.align === "right" && fromArrOnlyNum.length < toArrOnlyNum.length ? fromPositionArrOnlyNum[sameStacksIndices[i] - (toArrOnlyNum.length - fromArrOnlyNum.length)] : fromPositionArrOnlyNum[sameStacksIndices[i]];
         }
       }, "start").set(hideStacks, {
+        opacity: props.loading ? 0 : 1,
         x: (i) => props.align === "right" && fromArrOnlyNum.length < toArrOnlyNum.length ? fromPositionArrOnlyNum[hideStacksIndices[i] - (toArrOnlyNum.length - fromArrOnlyNum.length)] : fromPositionArrOnlyNum[hideStacksIndices[i]]
       }, "start").set(suffixRef.current, {
         x: props.align === "right" ? 0 : suffixFromPosition
       }, "start");
+      masterTl.current = gsap.timeline({ paused: true });
+      loadingTl.current = props.loading ? gsap.timeline().to(fromSplit.chars, {
+        opacity: 0.2,
+        duration: 0.8,
+        stagger: {
+          each: 0.1,
+          repeat: -1,
+          ease: "none",
+          yoyoEase: true
+        }
+      }) : null;
+      resetAfterLoading.current = gsap.timeline({ defaults: { ease: "none", duration: 0.1 } }).to(fromSplit.chars, { opacity: 1 }).to(fromSplitDiffNumbers, { opacity: 0 }, 0).to(sameStacks, { opacity: 1 }, 0).to(hideStacks, { opacity: 1 }, 0);
       tl.current = gsap.timeline({
-        paused: true,
-        delay,
-        onStart: () => setPlayLoop(!playLoop)
+        onStart: () => {
+          var _a3;
+          setPlayLoop(!playLoop);
+          (_a3 = loadingTl.current) == null ? void 0 : _a3.pause();
+        }
       });
       moveFromSameCharsToEndMotion.current = props.align === "right" ? gsap.to(fromSplitSameNumbers, __spreadValues({
         x: (i) => endPositionArrOnlyNum[fromSplitSameNumbersIndices[i] + (toArrOnlyNum.length - fromArrOnlyNum.length)] - fromPositionArrOnlyNum[fromSplitSameNumbersIndices[i]] - (toValWidth - fromValWidth),
@@ -3166,11 +3186,11 @@ function AnimateNumber2(props) {
         delay: (i) => (hideStacks == null ? void 0 : hideStacks.length) !== 0 ? 0 : hideStagger * countStaggerFromEnd(resultFromArrOnlyNum, hideCommaTargetIndices[i], props.align)
       }));
       handleDashMotion.current = gsap.timeline({
-        delay: dashResult === "hide" && hideStacks.length !== 0 ? 0 : dashResult === "show" && prefixText === "" ? stagger * countStagger(resultToArrOnlyNum, 0, props.align) : resultFromArrOnlyNum.length === resultToArrOnlyNum.length ? stagger * countStagger(resultFromArrOnlyNum, 0, props.align) : toHasLongerWidthThenFrom ? stagger * countStagger(resultFromArrOnlyNum, 0, props.align) : hideStacks.length === 0 ? stagger * countStagger(resultToArr, 0, props.align) : props.mode === "custom" ? loopCount * 0.02 : 0.05 + hideStacks.length * 0.01
+        delay: dashResult === "hide" && hideStacks.length !== 0 ? 0 : dashResult === "show" && props.prefix === "" ? stagger * countStagger(resultToArrOnlyNum, 0, props.align) : resultFromArrOnlyNum.length === resultToArrOnlyNum.length ? stagger * countStagger(resultFromArrOnlyNum, 0, props.align) : toHasLongerWidthThenFrom ? stagger * countStagger(resultFromArrOnlyNum, 0, props.align) : hideStacks.length === 0 ? stagger * countStagger(resultToArr, 0, props.align) : props.mode === "custom" ? loopCount * 0.02 : 0.05 + hideStacks.length * 0.01
       }).to(dashTarget, __spreadValues({
         opacity: dashResult === "hide" ? 0 : 1
       }, dashResult === "hide" ? hideEasing : showEasing)).fromTo(dashTarget, {
-        x: dashResult === "show" ? props.align === "right" && prefixText !== "" ? toValWidth - fromValWidth : 0 : 0
+        x: dashResult === "show" ? props.align === "right" && props.prefix !== "" ? toValWidth - fromValWidth : 0 : 0
       }, __spreadValues({
         x: dashResult === "same" ? props.align === "right" ? -(toValWidth - fromValWidth) : 0 : 0,
         immediateRender: false
@@ -3217,7 +3237,6 @@ function AnimateNumber2(props) {
       }, 0).set(showStacks, {
         x: (i) => fromArrOnlyNum.length < toArrOnlyNum.length ? endPositionArrOnlyNum[showStacksIndices[i]] : endPositionArrOnlyNum[showStacksIndices[i] + (toArrOnlyNum.length - fromArrOnlyNum.length)]
       }, 0) : repositionAllWhenAlignRightMotion.current = null;
-      console.log(hideStacks);
       props.align !== "right" ? moveSuffixToEndMotion.current = gsap.to(suffixRef.current, __spreadValues({
         x: suffixEndPosition,
         delay: resultFromArrOnlyNum.length === resultToArrOnlyNum.length ? stagger * countStagger(resultFromArrOnlyNum, resultFromArrOnlyNum.length - 1, props.align) : toHasLongerWidthThenFrom ? stagger * countStagger(resultFromArr, resultFromArr.length - 1, props.align) : hideStacks.length === 0 ? stagger * countStagger(resultToArr, resultToArr.length - 1, props.align) : props.mode === "custom" ? loopCount * 0.02 : 0.05 + hideStacks.length * 0.01
@@ -3226,7 +3245,8 @@ function AnimateNumber2(props) {
         width: prefixWidth + toValWidth + suffixWidth
       });
       (_d2 = tl.current) == null ? void 0 : _d2.addLabel("start", 0.1).add(toHasLongerWidthThenFrom ? changeWidthMotion.current : null, "start").add(moveAllWhenAlignCenterMotion.current, "start").add(moveFromSameCharsToEndMotion.current, "start").add(moveStacksToEndMotion.current, "start").add(handleDashMotion.current, "start").add(handleDotMotion.current, "start").add(moveSameCommasToEndMotion.current, "start").add(showToCommasMotion.current, "start").add(hideOutCommasMotion.current, "start").add(showNewStacksMotion.current, "start").add(hideOutStacksMotion.current, "start").add(moveSuffixToEndMotion.current, "start").add(movePrefixToEndMotion.current, "start").addLabel("endMotion").add(toHasLongerWidthThenFrom ? null : changeWidthMotion.current, "endMotion").add(repositionAllWhenAlignRightMotion.current, "endMotion").add(repositionAllWhenAlignCenterMotion.current, "endMotion");
-      (_e = tl.current) == null ? void 0 : _e.pause(0);
+      (_e = masterTl.current) == null ? void 0 : _e.add(loadingTl.current).add(resetAfterLoading.current, props.loading ? props.loadingDuration : delay).add(tl.current);
+      (_f = masterTl.current) == null ? void 0 : _f.pause(0);
     });
     return () => {
       ctx.revert();
@@ -3235,7 +3255,7 @@ function AnimateNumber2(props) {
   useEffect(() => {
     var _a2;
     console.log("restart");
-    (_a2 = tl.current) == null ? void 0 : _a2.restart(true, false);
+    (_a2 = masterTl.current) == null ? void 0 : _a2.restart(true, false);
     setResetLoop(!resetLoop);
   }, deps);
   useEffect(() => {
@@ -3294,6 +3314,7 @@ function AnimateNumber2(props) {
       mode: props.mode,
       loopCount,
       stackEasing,
+      isHideStack: resultArrOnlyNum[n] === "hide",
       startStaggerDelay: resultArrOnlyNum[n] === "hide" ? hideStagger * countStaggerFromEnd(resultArrOnlyNum, n, props.align) : stagger * countStagger(resultArrOnlyNum, n, props.align),
       toIsLargerThenFrom
     });
@@ -3303,7 +3324,9 @@ function AnimateNumber2(props) {
   }, isNaN(to) ? addCommasToString(to) : to.toLocaleString())), /* @__PURE__ */ React.createElement("div", {
     ref: suffixRef,
     className: suffix
-  }, props.suffix)));
+  }, props.suffix), /* @__PURE__ */ React.createElement("div", {
+    style: { opacity: 0 }
+  }, "0")));
 }
 addPropertyControls(AnimateNumber2, {
   replay: {
@@ -3311,6 +3334,18 @@ addPropertyControls(AnimateNumber2, {
     defaultValue: true,
     enabledTitle: "\u25B6\uFE0F",
     disabledTitle: "\u25B6\uFE0F"
+  },
+  loading: {
+    type: ControlType.Boolean,
+    defaultValue: false,
+    enabledTitle: "ON",
+    disabledTitle: "OFF"
+  },
+  loadingDuration: {
+    type: ControlType.Number,
+    defaultValue: 3,
+    step: 0.5,
+    displayStepper: true
   },
   delay: {
     type: ControlType.Number,
