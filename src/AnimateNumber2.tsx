@@ -1462,7 +1462,7 @@ export function AnimateNumber2(props) {
         <div ref={suffixRef} className={suffix}>
           {props.suffix}
         </div>
-        <div style={{ opacity: 0 }}>0</div>
+        <div style={{ opacity: 0, width: 0 }}>0</div>
       </div>
     </div>
   );
