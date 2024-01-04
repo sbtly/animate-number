@@ -3356,13 +3356,11 @@ addPropertyControls(AnimateNumber2, {
   from: {
     type: ControlType.Number,
     defaultValue: 0,
-    step: 1,
     displayStepper: true
   },
   to: {
     type: ControlType.Number,
     defaultValue: 1e3,
-    step: 1,
     displayStepper: true,
     description: "\n"
   },
